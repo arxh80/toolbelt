@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { stringify as llStringify } from "lossless-json";
 import {
   FileCode2,
   FileSpreadsheet,
@@ -223,7 +224,7 @@ export function ConversionPanel({ input }: { input: string }) {
                 )}
                 {jsonPathResult?.ok && jsonPathResult.matches.length > 0 && (
                   <pre className="font-mono text-[12.5px] leading-[1.65] whitespace-pre-wrap break-all text-[var(--fg)]">
-                    {JSON.stringify(jsonPathResult.matches, null, 2)}
+                    {llStringify(jsonPathResult.matches, null, 2) as string}
                   </pre>
                 )}
               </div>
@@ -234,7 +235,7 @@ export function ConversionPanel({ input }: { input: string }) {
                     {jsonPathResult.paths.length > 3 && ` · +${jsonPathResult.paths.length - 3}`}
                   </span>
                   <CopyButton
-                    value={JSON.stringify(jsonPathResult.matches, null, 2)}
+                    value={llStringify(jsonPathResult.matches, null, 2) as string}
                     label="Copy matches"
                     className="py-1"
                   />
