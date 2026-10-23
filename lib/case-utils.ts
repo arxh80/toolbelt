@@ -28,13 +28,13 @@ export const CASE_STYLES: { id: CaseStyle; label: string; example: string }[] = 
 
 /**
  * Splits identifiers and phrases into lowercase words. Handles separators
- * (spaces, `_`, `-`, `.`, `/`), camelCase and PascalCase boundaries, acronyms
- * (`XMLHttpRequest` -> xml, http, request), digits, and non-ASCII letters.
+ * (spaces, `_`, `-`, `.`, `/` by default), camelCase and PascalCase boundaries,
+ * acronyms (`XMLHttpRequest` -> xml, http, request), digits, and non-ASCII letters.
  */
-export function splitWords(input: string): string[] {
+export function splitWords(input: string, separators = /[_\-./\s]+/): string[] {
   const words: string[] = [];
   // Collapse every separator run first so "  Hello   World " behaves.
-  for (const chunk of input.split(/[_\-./\s]+/)) {
+  for (const chunk of input.split(separators)) {
     if (!chunk) continue;
     // lower-or-digit followed by upper: "userId" -> "user Id"
     // acronym run followed by a capitalised word: "XMLHttp" -> "XML Http"
@@ -51,9 +51,13 @@ export function splitWords(input: string): string[] {
 // Identifier styles keep only letters and digits; the prose styles keep punctuation.
 const IDENTIFIER_STYLES = new Set<CaseStyle>(["camel", "pascal", "snake", "constant", "kebab", "dot"]);
 
+// In prose, `.` and `/` are punctuation ("3.5", "a/b", a full stop), not word breaks.
+const PROSE_SEPARATORS = /[_\-\s]+/;
+
 function convertLine(line: string, style: CaseStyle): string {
-  let words = splitWords(line);
-  if (IDENTIFIER_STYLES.has(style)) {
+  const identifier = IDENTIFIER_STYLES.has(style);
+  let words = identifier ? splitWords(line) : splitWords(line, PROSE_SEPARATORS);
+  if (identifier) {
     words = words.map((w) => w.replace(/[^\p{L}\p{M}\p{N}]/gu, "")).filter(Boolean);
   }
   if (words.length === 0) return "";

@@ -94,4 +94,20 @@ describe("toCase", () => {
     expect(toCase("Hello, World!", "lower")).toBe("hello, world!");
     expect(toCase("Hello, World!", "upper")).toBe("HELLO, WORLD!");
   });
+
+  it("keeps . and / in the prose styles", () => {
+    expect(toCase("Hello. World.", "lower")).toBe("hello. world.");
+    expect(toCase("Hello. World.", "title")).toBe("Hello. World.");
+    expect(toCase("it's 3.5 km away", "lower")).toBe("it's 3.5 km away");
+    expect(toCase("Read the docs at example.com/start.", "lower")).toBe("read the docs at example.com/start.");
+    expect(toCase("Pick a/b, then stop", "upper")).toBe("PICK A/B, THEN STOP");
+  });
+
+  it("still splits _, - and case boundaries in the prose styles", () => {
+    expect(toCase("user_id", "title")).toBe("User Id");
+    expect(toCase("userId", "title")).toBe("User Id");
+    expect(toCase("kebab-case-name", "title")).toBe("Kebab Case Name");
+    expect(toCase("user.id", "camel")).toBe("userId");
+    expect(toCase("user/id", "snake")).toBe("user_id");
+  });
 });
